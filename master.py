@@ -1,7 +1,6 @@
 from ptocore.analyzercontext import AnalyzerContext
 
 from dataprep import prepare_data
-from analysis import analysis
 
 def main():
     ac = AnalyzerContext()
@@ -11,8 +10,7 @@ def main():
     filenames = files.map(lambda x: x[0]).collect()
     for filename in filenames:
         metadata, data = files.lookup(filename)[0]
-        cc_df, qq_df = prepare_data(filename, metadata, data)
-        analysis(cc_df, qq_df)
+        merged = prepare_data(filename, metadata, data)
 
 if __name__ == "__main__":
     main()
