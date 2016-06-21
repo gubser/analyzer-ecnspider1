@@ -37,6 +37,7 @@ def load_qof_df(filename, ipv6_mode=False, open_fn=open, spider_idx=None, count=
     # raw dataframe
     df = panfix.dataframe_from_ipfix(filename, open_fn=open_fn, count=count,
                ienames=(  "flowStartMilliseconds",
+                          "flowEndMilliseconds",
                           "octetDeltaCount",
                           "reverseOctetDeltaCount",
                           "transportOctetDeltaCount",
@@ -56,6 +57,8 @@ def load_qof_df(filename, ipv6_mode=False, open_fn=open, spider_idx=None, count=
                           "reverseTcpSynTotalCount",
                           "qofTcpCharacteristics",
                           "reverseQofTcpCharacteristics",
+                          "packetDeltaCount",
+                          "reversePacketDeltaCount",
                           "reverseMinimumTTL",
                           "reverseMaximumTTL"))
 
