@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 
 S = panfix.TCP_SYN
+SA = (panfix.TCP_SYN | panfix.TCP_ACK)
 SAE = (panfix.TCP_SYN | panfix.TCP_ECE | panfix.TCP_ACK)
 SEW = (panfix.TCP_SYN | panfix.TCP_ECE | panfix.TCP_CWR)
 SAEW = (panfix.TCP_SYN | panfix.TCP_ECE | panfix.TCP_ACK | panfix.TCP_CWR)
@@ -154,14 +155,18 @@ def load_qof_df(filename, ipv6_mode=False, open_fn=open, count=None):
     else:
         df.index = df[dip_ie].apply(str)
 
-    df[dip_ie] = df[dip_ie].apply(str)
-    df[sip_ie] = df[sip_ie].apply(str)
-
     # mark IPv6 mode
     df['ip6'] = ipv6_mode
 
     # mark ecn attempted
     df["ecnAttempted"] = np.bitwise_and(df["lastSynTcpFlags"],SAEW) == SEW
+    df["ecnNegotiated"] = np.bitwise_and(df["reverseLastSynTcpFlags"],SAEW) == SAE
+    df["ecnCapable"] = np.bitwise_and(df["reverseQofTcpCharacteristics"],QECT0) > 0
+    df["ecnECT1"] = np.bitwise_and(df["reverseQofTcpCharacteristics"],QECT1) > 0
+    df["ecnCE"] = np.bitwise_and(df["reverseQofTcpCharacteristics"],QCE) > 0
+    df["didEstablish"] = ((np.bitwise_and(df["lastSynTcpFlags"], S) == S) &
+                          (np.bitwise_and(df["reverseLastSynTcpFlags"], SA) == SA))
+    df["isUniflow"] = (df["reverseMaximumTTL"] == 0)
 
     # rename columns
     df['sip'] = df[sip_ie]
@@ -187,34 +192,6 @@ def split_qof_df(df):
     qe1_df = qe1_df.loc[qof_idx]
 
     return (qe0_df, qe1_df)
-
-def map_new_format_sub(row, suffix, ecnXok):
-    return {
-        'first'        : row['flowStartMilliseconds'+suffix],
-        'last'         : row['flowEndMilliseconds'+suffix],
-        'sp'           : row['sourceTransportPort'+suffix],
-        'dp'           : row['destinationTransportPort'+suffix],
-        'connstate'    : row[ecnXok],
-        'ecnstate'     : row['ecnAttempted'+suffix],
-        'fwd_syn_flags': row['initialTCPFlags'+suffix],
-        'rev_syn_flags': row['reverseInitialTCPFlags'+suffix],
-        'pkt_fwd'      : row['packetDeltaCount'+suffix],
-        'pkt_rev'      : row['reversePacketDeltaCount'+suffix],
-        'oct_fwd'      : row['octetDeltaCount'+suffix],
-        'oct_rev'      : row['reverseOctetDeltaCount'+suffix],
-        'ecn_zero'     : row['reverseQofTcpCharacteristics'+suffix] & QECT0,
-        'ecn_one'      : row['reverseQofTcpCharacteristics'+suffix] & QECT1,
-        'ce'           : row['reverseQofTcpCharacteristics'+suffix] & QCE
-    }
-
-def map_new_format(row):
-    return {
-        'site': row['site'],
-        'dip': row['dip_0'],
-        'proto': 6,
-        'ecn0': map_new_format_sub(row, '_0', 'ecn0ok'),
-        'ecn1': map_new_format_sub(row, '_1', 'ecn1ok')
-    }
 
 def prepare_data(filename, metadata, data):
     zf = ZipFile(BytesIO(data))
