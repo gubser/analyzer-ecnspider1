@@ -166,7 +166,6 @@ def load_qof_df(filename, ipv6_mode=False, open_fn=open, count=None):
     df["ecnCE"] = np.bitwise_and(df["reverseQofTcpCharacteristics"],QCE) > 0
     df["didEstablish"] = ((np.bitwise_and(df["lastSynTcpFlags"], S) == S) &
                           (np.bitwise_and(df["reverseLastSynTcpFlags"], SA) == SA))
-    df["isUniflow"] = (df["reverseMaximumTTL"] == 0)
 
     # rename columns
     df['sip'] = df[sip_ie]

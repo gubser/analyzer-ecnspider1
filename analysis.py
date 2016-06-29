@@ -3,7 +3,7 @@ import numpy as np
 from collections import defaultdict
 
 
-def create_observation(source, row):
+def create_observations(source, row):
     def none_aware(a, b, op=min):
         if a is not None and b is not None:
             return op(a, b)
@@ -33,21 +33,18 @@ def create_observation(source, row):
         else:
             cond_ecnconn = 'ecn.connectivity.offline'
 
-    conditions = ["ecnspider.basic"]
+    cond_ecnnego = 'ecn.negotiated' if row['ecnNegotiated_1'] else 'ecn.not_negotiated'
 
-    value = {
-        'ecn': {
-            'conn': cond_ecnconn,
-            'nego': row['ecnNegotiated_1']
-        }
-    }
+    conditions = [cond_ecnconn, cond_ecnnego]
+
+    value = {}
 
     obs =  {
-        'condition': conditions,
+        'conditions': conditions,
         'time': time,
         'path': path,
         'value': value,
         'sources': [source]
     }
 
-    return obs
+    return [obs]
