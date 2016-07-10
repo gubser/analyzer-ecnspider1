@@ -1,6 +1,0 @@
-{
-  "input_formats": ["ecnspider1"],
-  "input_types": [],
-  "output_types": ["ecn"],
-  "command_line": ["python", "master.py"]
-}

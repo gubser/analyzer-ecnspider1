@@ -1,0 +1,11 @@
+{
+  "input_formats": ["ecnspider1-zip-csv-ipfix"],
+  "input_types": [],
+  "output_types": ["ecn.connectivity.works",
+   "ecn.connectivity.broken",
+   "ecn.connectivity.transient",
+   "ecn.connectivity.offline",
+   "ecn.negotiated",
+   "ecn.not_negotiated"],
+  "command_line": ["python3", "master.py"]
+}
