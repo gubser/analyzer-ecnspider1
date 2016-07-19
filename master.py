@@ -1,4 +1,5 @@
 from ptocore.analyzercontext import AnalyzerContext
+from ptocore import sensitivity
 
 import dataprep
 import analysis
@@ -22,11 +23,14 @@ def grouper(iterable, count):
 def main():
     ac = AnalyzerContext()
 
-    max_action_id, timespans = ac.sensitivity.basic()
-    ac.set_result_info(max_action_id, timespans)
+    max_action_id, upload_ids = sensitivity.direct(ac.action_set)
+    # analyze one upload per run
+    upload_ids = [upload_ids[0]] if len(upload_ids) > 0 else []
+    print("running it with: ", max_action_id, upload_ids)
+    ac.set_result_info_direct(max_action_id, upload_ids)
 
     # complicated way to get data file by file out of hdfs
-    files = ac.spark_uploads(["ecnspider1-zip-csv-ipfix"])
+    files = ac.spark_uploads_direct()
     filenames = files.map(lambda x: x[0]).collect()
     for filename in filenames:
         metadata, data = files.lookup(filename)[0]
