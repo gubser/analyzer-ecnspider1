@@ -45,9 +45,6 @@ def main():
                 obsns = analysis.create_observations(upload_action_id, row)
 
                 for obs in obsns:
-                    # TODO should be done in validator
-                    obs['analyzer_id'] = ac.analyzer_id
-
                     bulk.append(InsertOne(obs))
 
             ac.temporary_coll.bulk_write(bulk)
