@@ -7,5 +7,6 @@
    "ecn.connectivity.offline",
    "ecn.negotiated",
    "ecn.not_negotiated"],
-  "command_line": ["python3", "master.py"]
+  "command_line": ["python3", "master.py"],
+  "direct": true
 }
