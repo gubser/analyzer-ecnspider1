@@ -44,7 +44,7 @@ def create_observations(source, row):
         'time': time,
         'path': path,
         'value': value,
-        'sources': [source]
+        'sources': {'upl': [source]}
     }
 
     return [obs]
